@@ -8,8 +8,15 @@ import pygtk
 pygtk.require('2.0')
 import pynotify
 import datetime
+import os
 
-data = shelve.open("/home/pfarmer/Dropbox/src/Py-StackExchange/data.shelf")
+HOMEDIR="/home/pfarmer"
+APPDIR="%s/.so-notify/" % HOMEDIR
+
+if not os.path.exists(APPDIR):
+    os.mkdir(APPDIR)
+
+data = shelve.open("%s/data.shelf" % APPDIR)
 
 site = stackexchange.Site(
     "api.stackoverflow.com",
