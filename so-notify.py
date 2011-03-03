@@ -12,6 +12,7 @@ import os
 
 HOMEDIR="/home/pfarmer"
 APPDIR="%s/.so-notify/" % HOMEDIR
+USERID=66020
 
 if not os.path.exists(APPDIR):
     os.mkdir(APPDIR)
@@ -47,6 +48,21 @@ for tag in tags:
     else:
         notify_tags.append(tag)
         data[key] = last_id
+
+user = site.user(USERID)
+rep = user.reputation
+
+user_key = "%i-rep" % USERID
+notify_rep = 0
+
+if data.has_key(user_key):
+    if rep > data[user_key]:
+        notify_rep = rep
+        data[user_key] = rep
+else:
+    notify_rep = rep
+    data[user_key] = rep
+
 data.close()
 
 output = open("/home/pfarmer/.conky/stackoverflow.txt", "w")
@@ -80,7 +96,15 @@ if len(notify_tags):
     for tag in notify_tags:
         message = message + "\t%s\n" % tag
 
+    if notify_rep > 0:
+        message = message + "\nRep: %i\n" % notify_rep
     # message = message + "\n%s\n" % str(site.rate_limit)
+
+    n = pynotify.Notification("StackOverflow", message)
+    n.set_timeout(10000)
+    n.show()
+elif notify_rep > 0:
+    message = "Rep: %i" % notify_rep
 
     n = pynotify.Notification("StackOverflow", message)
     n.set_timeout(10000)
